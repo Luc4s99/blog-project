@@ -1,0 +1,72 @@
+@import './index.css';
+
+.blogBody {
+
+    background-color: var(--body-color);
+}
+
+.blog-navbar {
+
+    border-block-end: 2px solid var(--primary-color);
+}
+
+.footer {
+
+  display: grid;
+  place-items: center;
+  bottom: 0px;
+  height: 50px;
+  width: 100%;
+  color: var(--font-color);
+  border-block-start: 2px solid var(--primary-color);
+}
+
+.card-box {
+
+    margin-top: 2%;
+    display: inline-block;
+    width: 25%;
+    padding-right: 1%;
+    
+}
+
+.post-card {
+
+    box-shadow: 5px 5px var(--primary-color)
+}
+
+.container {
+
+    /*50px da altura do footer e 58px da altura da navbar*/
+    min-height: calc(100vh - 108px);
+    color: var(--font-color);
+    font-family: var(--body-font);
+}
+
+.primary-container {
+
+    text-align: center;
+}
+
+.primary-box {
+
+    text-align: justify;
+    border: 2px solid var(--primary-color);
+    border-radius: 10px;
+    padding: 20px;
+    width: 50%;
+    display: inline-block;
+}
+
+.commentsContainer {
+
+    background-color: var(--comement-container-color);
+    padding: 20px;
+    text-align: justify;
+    color: var(--comments-font-color);
+}
+
+.commentBox {
+
+    background-color: var(--comment-box-color);
+}

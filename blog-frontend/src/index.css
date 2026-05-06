@@ -1,0 +1,17 @@
+:root {
+
+    /*Colors*/
+    --primary-color: #7965C1;
+
+    --body-color: #0E2148;
+
+    --font-color: #dfddd6;
+    --comments-font-color: #000;
+
+    --comement-container-color: rgb(211, 199, 199);
+    --comment-box-color: rgb(240, 231, 231);
+
+    /*Fonts*/
+
+    --body-font: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}

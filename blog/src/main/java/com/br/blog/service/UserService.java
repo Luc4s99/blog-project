@@ -42,6 +42,11 @@ public class UserService {
         return userRepository.getUserByEmail(email);
     }
 
+    public UserDetails getUserDetailsByEmail(String email) {
+
+        return userRepository.findByEmail(email);
+    }
+
     public List<User> getLikeUsername(String loginLike) {
 
         return userRepository.findLikeLogin(loginLike);

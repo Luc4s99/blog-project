@@ -56,7 +56,7 @@ export default function App() {
                 <div className="card-header">Post</div>
                 <div className="card-body">
                   <h5 className="card-title">{post.title}</h5>
-                  <p className="card-text">Autor: {post.author.username}</p>
+                  <p className="card-text">Autor: {post.author.login}</p>
                   <Link to={`/posts/${post.id}`} className="btn btn-primary me-2">Ver Post</Link>
                   <Link to={`/editar/${post.id}`} hidden={verifyAuthor(post.author.id)} className="btn btn-secondary">Editar Post</Link>
                 </div>

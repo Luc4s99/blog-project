@@ -60,7 +60,7 @@ export default function Navbar() {
 
                                     <li className="nav-item dropdown">
                                         <a className="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                            {loggedUser?.username}
+                                            {loggedUser?.login}
                                         </a>
                                         <ul className="dropdown-menu">
                                             <li><a className="dropdown-item" onClick={logout}>Sair</a></li>

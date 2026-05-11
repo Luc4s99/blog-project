@@ -52,11 +52,12 @@ export const UserProvider = ({ children }: Props) => {
             if (res) {
 
                 localStorage.setItem("token", res?.data.token);
+                localStorage.setItem("token", res?.data.refreshToken);
 
                 const userObj = {
 
                     id: res?.data.user.id,
-                    username: res?.data.user.username,
+                    login: res?.data.user.username,
                     email: res?.data.user.email
                 };
 
@@ -77,11 +78,12 @@ export const UserProvider = ({ children }: Props) => {
             if (res) {
 
                 localStorage.setItem("token", res?.data.token);
+                localStorage.setItem("refreshToken", res?.data.refreshToken);
 
                 const userObj: User = {
 
                     id: res?.data.user.id,
-                    username: res?.data.user.username,
+                    login: res?.data.user.username,
                     email: res?.data.user.email
                 };
 

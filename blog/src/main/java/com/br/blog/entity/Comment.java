@@ -4,6 +4,8 @@ import java.util.Date;
 
 public class Comment {
 
+    //TODO Adicionar identificadores para comentário
+
     private String content;
     private Date createdAt;
     private String username;

@@ -1,6 +1,5 @@
 package com.br.blog.service;
 
-import com.br.blog.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -9,16 +8,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthService implements UserDetailsService {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
 
-    public AuthService(UserRepository userRepository) {
+    public AuthService(UserService userService) {
 
-        this.userRepository = userRepository;
+        this.userService = userService;
     }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
-        return userRepository.findByEmail(email);
+        return userService.getUserDetailsByEmail(email);
     }
 }

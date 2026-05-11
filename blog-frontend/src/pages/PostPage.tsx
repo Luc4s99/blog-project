@@ -46,7 +46,7 @@ export default function PostPage() {
 
             content: commentContent,
             createdAt: new Date(),
-            username: getUser()?.username ?? 'Anônimo'
+            username: getUser()?.login ?? 'Anônimo'
             
         }
 
@@ -67,7 +67,7 @@ export default function PostPage() {
             <Navbar/>
 
             <div className='mb-2 container'>
-                <h6 className='mt-2'>Por: {post?.author?.username}</h6>
+                <h6 className='mt-2'>Por: {post?.author?.login}</h6>
 
                 <h2 className='text-center mt-3'>{post?.title}</h2>
 

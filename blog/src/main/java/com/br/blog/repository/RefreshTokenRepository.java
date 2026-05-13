@@ -12,4 +12,6 @@ public interface RefreshTokenRepository extends MongoRepository<RefreshToken, St
     RefreshToken findByToken(String refreshToken);
 
     RefreshToken findByUser(String user);
+
+    void deleteByToken(String token);
 }

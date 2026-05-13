@@ -4,8 +4,9 @@ import { toast } from 'react-toastify';
 
 const api = axios.create({
     
-    baseURL: 'http://localhost:8080/api/v1'
-})
+    baseURL: 'http://localhost:8080/api/v1',
+    withCredentials: true
+});
 
 //Interceptor para adicionar o token de autenticação em cada request
 api.interceptors.request.use(
@@ -48,7 +49,6 @@ api.interceptors.response.use(
             //Tenta utilizar o refresh token para conseguir um novo acces token
             const refreshResponse = await api.post('/auth/refresh', 
                 {
-                    refreshToken: localStorage.getItem('refreshToken'),
                     user: user
                 }
             );

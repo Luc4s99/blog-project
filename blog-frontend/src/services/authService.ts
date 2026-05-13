@@ -63,3 +63,8 @@ export const login = async(email: string, password: string) => {
 
     return await api.post('/auth/login', {email, password});
 }
+
+export const logoutAPI = async() => {
+
+    return await api.post('/auth/logout');
+}

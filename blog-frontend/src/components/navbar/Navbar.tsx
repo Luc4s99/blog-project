@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 import type { User } from "../../models/User";
+import { useAuth } from "../../contexts/useAuth";
 
 export default function Navbar() {
 
     const [searchCriteria, setSearchCriteria] = useState('');
     const [loggedUser, setLoggedUser] = useState<User>();
-    const navigate = useNavigate();
+    const { logout } = useAuth();
 
     useEffect(() => {
 
@@ -26,10 +27,9 @@ export default function Navbar() {
         getLoggedUser();
     }, []);
 
-    const logout = () => {
+    const logoutUser = () => {
 
-        localStorage.clear();
-        navigate('/');
+        logout();
     }
 
     return (
@@ -63,7 +63,7 @@ export default function Navbar() {
                                             {loggedUser?.login}
                                         </a>
                                         <ul className="dropdown-menu">
-                                            <li><a className="dropdown-item" onClick={logout}>Sair</a></li>
+                                            <li><a className="dropdown-item" onClick={logoutUser}>Sair</a></li>
                                         </ul>
                                     </li>
                                 </ul>

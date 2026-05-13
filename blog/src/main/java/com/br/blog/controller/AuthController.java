@@ -11,16 +11,15 @@ import com.br.blog.entity.RefreshToken;
 import com.br.blog.entity.User;
 import com.br.blog.service.RefreshTokenService;
 import com.br.blog.service.UserService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -58,10 +57,20 @@ public class AuthController {
             //Gerando refresh token
             RefreshToken refreshToken = tokenConfig.generateRefreshToken(user);
 
+            //Armazena o refresh token em um cookie HttpOnly
+            ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken.getToken())
+                    .httpOnly(true)
+                    //.secure(true) //Necessita a configuração do HTTPS
+                    .path("/api/v1/auth") //Define em quais rotas do backend o cookie será enviado automaticamente pelo navegador
+                    .sameSite("Strict")
+                    .build();
+
             //Gerando access token
             String token = tokenConfig.generateToken(user);
 
-            return ResponseEntity.ok(new LoginResponse(token, refreshToken.getToken(), user));
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                    .body(new LoginResponse(token, user));
         }
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -85,34 +94,71 @@ public class AuthController {
 
         RefreshToken refreshToken = tokenConfig.generateRefreshToken(user);
 
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken.getToken())
+                .httpOnly(true)
+                //.secure(true)
+                .path("/api/auth")
+                .sameSite("Strict")
+                .build();
+
         String token = tokenConfig.generateToken(savedUser);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(new RegisterUserResponse(savedUser, token, refreshToken.getToken()));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(new RegisterUserResponse(savedUser, token));
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<RefreshTokenResponse> refreshToken(@RequestBody RefreshTokenRequest request) {
-
-        RefreshToken refreshToken = refreshTokenService.getRefreshTokenByToken(request.refreshToken());
+    public ResponseEntity<RefreshTokenResponse> refreshToken(@RequestBody RefreshTokenRequest request,
+                                                             @CookieValue(name = "refreshToken") String refreshToken) {
 
         if(refreshToken != null) {
 
-            refreshToken = tokenConfig.verifyExpiration(refreshToken);
+            RefreshToken refreshTokenObj = refreshTokenService.getRefreshTokenByToken(refreshToken);
 
-            if(refreshToken.isRevoked()) {
+            if(refreshTokenObj != null) {
 
-                refreshTokenService.deleteRefreshToken(refreshToken);
+                refreshTokenObj = tokenConfig.verifyExpiration(refreshTokenObj);
 
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+                if(refreshTokenObj.isRevoked()) {
+
+                    refreshTokenService.deleteRefreshToken(refreshTokenObj);
+
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+                }
+
+                //TODO Gerar também novo refresh token
+
+                String accessToken = tokenConfig.generateToken(request.user());
+
+                ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshTokenObj.getToken())
+                        .httpOnly(true)
+                        //.secure(true)
+                        .path("/api/auth")
+                        .sameSite("Strict")
+                        .build();
+
+                return ResponseEntity.status(HttpStatus.OK)
+                        .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                        .body(new RefreshTokenResponse(accessToken));
             }
-
-            //TODO Gerar também novo refresh token
-
-            String accessToken = tokenConfig.generateToken(request.user());
-
-            return ResponseEntity.status(HttpStatus.OK).body(new RefreshTokenResponse(accessToken, refreshToken.getToken()));
         }
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@CookieValue(name = "refreshToken") String refreshToken) {
+
+        if(refreshToken != null) {
+
+            refreshTokenService.deleteToken(refreshToken);
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, "")
+                    .body("Logout realizado com sucesso");
+        }
+
+        return ResponseEntity.badRequest().build();
     }
 }

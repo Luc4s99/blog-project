@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import type { User } from "../models/User";
 import { createContext, useEffect, useState } from "react";
-import { loginAPI, registerAPI } from "../services/authService";
+import { loginAPI, registerAPI, logoutAPI } from "../services/authService";
 import React from "react";
 
 type UserContextType = {
@@ -78,7 +78,6 @@ export const UserProvider = ({ children }: Props) => {
             if (res) {
 
                 localStorage.setItem("token", res?.data.token);
-                localStorage.setItem("refreshToken", res?.data.refreshToken);
 
                 const userObj: User = {
 
@@ -103,15 +102,14 @@ export const UserProvider = ({ children }: Props) => {
         return !!user;
     };
 
-    const logout = () => {
+    const logout = async () => {
 
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
+        await logoutAPI().then(() => {
 
-        setUser(null);
-        setToken("");
+            localStorage.clear();
 
-        navigate("/login");
+            navigate("/login");
+        });
     };
 
     return (

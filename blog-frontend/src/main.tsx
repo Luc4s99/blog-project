@@ -1,4 +1,3 @@
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { ToastContainer } from 'react-toastify';
 import './index.css'
@@ -20,7 +19,7 @@ import Register from './pages/Register.tsx';
 createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
     <UserProvider>
-      <StrictMode>
+      <>
         <Routes>
           
           <Route path='/' element={<LandingPage />}></Route>
@@ -34,7 +33,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path='/posts/search' element={<ProtectedRoute><PostSearch /></ProtectedRoute>}></Route>
         </Routes>
         <ToastContainer />
-      </StrictMode>
+      </>
     </UserProvider>
   </BrowserRouter>,
 )

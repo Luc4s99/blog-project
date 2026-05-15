@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,32 +49,38 @@ public class AuthController {
 
         //Essa autenticação procura por um UserDetailsService para fazer a autenticação
         //Utilizando o metodo loadUserByUsername implementado no AuthService
-        Authentication authentication = authenticationManager.authenticate(userAndPass);
+        try {
 
-        User user = (User) authentication.getPrincipal();
+            Authentication authentication = authenticationManager.authenticate(userAndPass);
 
-        if(user != null) {
+            User user = (User) authentication.getPrincipal();
 
-            //Gerando refresh token
-            RefreshToken refreshToken = tokenConfig.generateRefreshToken(user);
+            if(user != null) {
 
-            //Armazena o refresh token em um cookie HttpOnly
-            ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken.getToken())
-                    .httpOnly(true)
-                    //.secure(true) //Necessita a configuração do HTTPS
-                    .path("/api/v1/auth") //Define em quais rotas do backend o cookie será enviado automaticamente pelo navegador
-                    .sameSite("Strict")
-                    .build();
+                //Gera e salva o refresh token
+                RefreshToken refreshToken = refreshTokenService.saveRefreshToken(tokenConfig.generateRefreshToken(user));
 
-            //Gerando access token
-            String token = tokenConfig.generateToken(user);
+                //Armazena o refresh token em um cookie HttpOnly
+                ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken.getToken())
+                        .httpOnly(true)
+                        //.secure(true) //Necessita a configuração do HTTPS
+                        .path("/api/v1/auth") //Define em quais rotas do backend o cookie será enviado automaticamente pelo navegador
+                        .sameSite("Strict")
+                        .build();
 
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                    .body(new LoginResponse(token, user));
+                //Gerando access token
+                String token = tokenConfig.generateToken(user);
+
+                return ResponseEntity.ok()
+                        .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                        .body(new LoginResponse(token, user));
+            }
+
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch (AuthenticationException e) {
+
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     @PostMapping("/register")
@@ -92,12 +99,13 @@ public class AuthController {
 
         User savedUser = userService.addUser(user);
 
-        RefreshToken refreshToken = tokenConfig.generateRefreshToken(user);
+        //Gera e salva o refresh token
+        RefreshToken refreshToken = refreshTokenService.saveRefreshToken(tokenConfig.generateRefreshToken(user));
 
         ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken.getToken())
                 .httpOnly(true)
                 //.secure(true)
-                .path("/api/auth")
+                .path("/api/v1/auth")
                 .sameSite("Strict")
                 .build();
 
@@ -127,14 +135,19 @@ public class AuthController {
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
                 }
 
-                //TODO Gerar também novo refresh token
-
                 String accessToken = tokenConfig.generateToken(request.user());
 
-                ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshTokenObj.getToken())
+                //Gera novo refresh token (token rotation)
+                RefreshToken newRefreshToken = refreshTokenService.saveRefreshToken(tokenConfig.generateRefreshToken(request.user()));
+
+                //Apaga refresh token antigo do banco
+                refreshTokenService.deleteToken(refreshTokenObj.getToken());
+
+                //Atualiza cookie com o novo refresh token
+                ResponseCookie cookie = ResponseCookie.from("refreshToken", newRefreshToken.getToken())
                         .httpOnly(true)
                         //.secure(true)
-                        .path("/api/auth")
+                        .path("/api/v1/auth")
                         .sameSite("Strict")
                         .build();
 

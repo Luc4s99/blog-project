@@ -3,6 +3,7 @@ import type { User } from "../models/User";
 import { createContext, useEffect, useState } from "react";
 import { loginAPI, registerAPI, logoutAPI } from "../services/authService";
 import React from "react";
+import { toast } from "react-toastify";
 
 type UserContextType = {
 
@@ -90,9 +91,12 @@ export const UserProvider = ({ children }: Props) => {
 
                 setToken(res.data.token!);
                 setUser(userObj!);
-                
-                
-                navigate("/home");
+
+                toast.success('Login realizado com sucesso!');
+                navigate('/home');
+            }else {
+
+                toast.error('Email ou senha inválidos!');
             }
         });
     };
@@ -106,9 +110,8 @@ export const UserProvider = ({ children }: Props) => {
 
         await logoutAPI().then(() => {
 
-            localStorage.clear();
-
             navigate("/login");
+            localStorage.clear();
         });
     };
 

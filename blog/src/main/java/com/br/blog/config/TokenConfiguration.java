@@ -57,13 +57,10 @@ public class TokenConfiguration {
                 .withIssuedAt(Instant.now())
                 .sign(Algorithm.HMAC256(secret));
 
-        RefreshToken refreshTokenObj = new RefreshToken(false,
+        return new RefreshToken(false,
                                         Date.from(Instant.now().plusSeconds(this.refreshTokenDuration)),
                                         user.getId(),
                                         refreshToken);
-
-        refreshTokenService.saveRefreshToken(refreshTokenObj);
-        return refreshTokenObj;
     }
 
     public RefreshToken verifyExpiration(RefreshToken token) {

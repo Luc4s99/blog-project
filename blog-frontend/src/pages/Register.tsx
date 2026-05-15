@@ -36,7 +36,7 @@ export default function Register() {
 
             if(resUsername.status === 200) {
 
-                notifyError('Esse nome de usuário não está disponível!');
+                toast.error('Esse nome de usuário não está disponível!');
                 return;
             }
 
@@ -44,32 +44,22 @@ export default function Register() {
 
             if(resEmail.status === 200) {
 
-                notifyError('Email já cadastrado!');
+                toast.error('Email já cadastrado!');
                 return;
             }
 
             registerUser(email, username, password);
 
-            notifySuccess('Registro realizado com sucesso!');
+            toast.success('Registro realizado com sucesso!');
         }else {
 
-            notifyError('As senhas devem ser iguais!');
+            toast.error('As senhas devem ser iguais!');
         }
     }
 
     const equalPasswords = () => {
 
         return password === confirmationPassword;
-    }
-
-    const notifySuccess = (message: string) => {
-    
-        toast.success(message);
-    }
-
-    const notifyError = (message: string) => {
-    
-        toast.error(message);
     }
 
     return (

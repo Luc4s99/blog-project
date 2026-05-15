@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/useAuth';
-import { toast } from 'react-toastify';
 
 export default function Login() {
 
@@ -11,7 +10,6 @@ export default function Login() {
     const login = async () => {
 
         loginUser(email, password);
-        toast.success('Login realizado com sucesso!');
     }
 
     return (

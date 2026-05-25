@@ -4,8 +4,7 @@ import java.util.Date;
 
 public class Comment {
 
-    //TODO Adicionar identificadores para comentário
-
+    private String id;
     private String content;
     private Date createdAt;
     private String username;
@@ -17,6 +16,14 @@ public class Comment {
         this.content = content;
         this.createdAt = createdAt;
         this.username = username;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getContent() {

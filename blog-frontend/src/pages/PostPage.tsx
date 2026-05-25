@@ -2,16 +2,18 @@ import Footer from "../components/footer/Footer";
 import Navbar from "../components/navbar/Navbar";
 import { useEffect, useState } from 'react';
 import api from "../services/api";
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import type { Post } from '../models/Post';
 import type { Comment } from '../models/Comment';
 import { getUser } from '../services/authService';
+import { v4 as uuid } from 'uuid';
 
 export default function PostPage() {
 
     const [commentContent, setCommentContent] = useState('');
     const [postComments, setPostComments] = useState<Comment[]>();
-    const [post, setPost] = useState<Post>()
+    const [post, setPost] = useState<Post>();
+    const navigate = useNavigate();
 
     const { id } = useParams();
 
@@ -31,7 +33,7 @@ export default function PostPage() {
 
     const saveComment = () => {
 
-        //const updatedPost = structuredClone(post);
+        //Como os comentários são atrelados ao post, para salvar um comentário deve ser atualizado o post junto
         const updatedPost = {
 
             id: post?.id,
@@ -44,6 +46,7 @@ export default function PostPage() {
 
         const newComment: Comment = {
 
+            id: uuid(),
             content: commentContent,
             createdAt: new Date(),
             username: getUser()?.login ?? 'Anônimo'
@@ -62,11 +65,19 @@ export default function PostPage() {
         setCommentContent('');
     }
 
+    const goBack = () => {
+
+        navigate('/home');
+    }
+
     return(
         <div className='blogBody'>
             <Navbar/>
 
             <div className='mb-2 container'>
+
+                <button type="button" className="btn btn-secondary mb-2 mt-2" onClick={goBack}>Voltar</button>
+
                 <h6 className='mt-2'>Por: {post?.author?.login}</h6>
 
                 <h2 className='text-center mt-3'>{post?.title}</h2>
@@ -84,7 +95,7 @@ export default function PostPage() {
                     {
                         postComments?.map((comment: Comment) => (
 
-                            <div className='commentBox'>
+                            <div className='commentBox' key={comment.id}>
                                 <h6 className='ms-4'>{comment.username}:</h6>
                                 <p className='ms-5'>{comment.content}</p>
                             </div>

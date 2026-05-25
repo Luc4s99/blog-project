@@ -70,3 +70,9 @@
 
     background-color: var(--comment-box-color);
 }
+
+.commentHeaderBox {
+
+    display: inline-block;
+    width: 50%;
+}

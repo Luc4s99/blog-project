@@ -65,11 +65,19 @@ export default function PostForm() {
         toast.success(message);
     }
 
+    const goBack = () => {
+
+        navigate('/home');
+    }
+
     return (
         <div className='blogBody'>
             <Navbar />
 
             <div className='container'>
+
+                <button type="button" className="btn btn-secondary mb-2 mt-2" onClick={goBack}>Voltar</button>
+
                 <form>
 
                     <div className="mb-3 mt-2">

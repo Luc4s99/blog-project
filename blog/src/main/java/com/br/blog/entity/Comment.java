@@ -8,6 +8,7 @@ public class Comment {
     private String content;
     private Date createdAt;
     private String username;
+    private boolean edited;
 
     public Comment() {
     }
@@ -48,5 +49,13 @@ public class Comment {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public boolean isEdited() {
+        return edited;
+    }
+
+    public void setEdited(boolean edited) {
+        this.edited = edited;
     }
 }

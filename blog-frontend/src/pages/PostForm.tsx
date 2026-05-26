@@ -10,8 +10,9 @@ import { getUser } from '../services/authService';
 
 export default function PostForm() {
 
-    const [title, setTitle] = useState("");
-    const [content, setContent] = useState("");
+    const [inputTitle, setInputTitle] = useState("");
+    const [inputContent, setInputContent] = useState("");
+    const [post, setPost] = useState<Post>();
     const navigate = useNavigate();
     const { id } = useParams();
 
@@ -24,8 +25,9 @@ export default function PostForm() {
                 const response = await api.get(`/posts/${id}`);
                 const postReceived: Post = response.data;
 
-                setTitle(postReceived.title);
-                setContent(postReceived.content);
+                setInputTitle(postReceived.title);
+                setInputContent(postReceived.content);
+                setPost(postReceived);
             }
         }
 
@@ -38,12 +40,25 @@ export default function PostForm() {
 
         if(id) {
 
-            const editedPost = {id, title, content, author: loggedUser?.id, createdAt: new Date()};
+            const editedPost = {
+                id: id, 
+                title: inputTitle, 
+                content: inputContent, 
+                author: loggedUser?.id, 
+                createdAt: post?.createdAt, 
+                comments: post?.comments
+            };
 
             await api.put("/posts", editedPost);
         }else {
 
-            const newPost = {title, content, author: loggedUser?.id, createdAt: new Date()};
+            const newPost = {
+                title: inputTitle, 
+                content: inputContent, 
+                author: loggedUser?.id, 
+                createdAt: post?.createdAt, 
+                comments: post?.comments
+            };
 
             await api.post("/posts", newPost);
         }
@@ -82,14 +97,14 @@ export default function PostForm() {
 
                     <div className="mb-3 mt-2">
                         <label htmlFor="postTitle" className="form-label">Título</label>
-                        <input id="postTitle" value={title} className="form-control" type="text" placeholder="Título do post" aria-label="default input example"
-                            onChange={(e) => setTitle(e.target.value)}></input>
+                        <input id="postTitle" value={inputTitle} className="form-control" type="text" placeholder="Título do post" aria-label="default input example"
+                            onChange={(e) => setInputTitle(e.target.value)}></input>
                     </div>
 
                     <div className="mb-3">
                         <label htmlFor="contentText" className="form-label">Conteúdo</label>
-                        <textarea className="form-control" value={content} id="contentText" rows={15} 
-                            onChange={(e) => setContent(e.target.value)}></textarea>
+                        <textarea className="form-control" value={inputContent} id="contentText" rows={15} 
+                            onChange={(e) => setInputContent(e.target.value)}></textarea>
                     </div>
                 </form>
 

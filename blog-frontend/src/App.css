@@ -76,3 +76,10 @@
     display: inline-block;
     width: 50%;
 }
+
+.commentButtonBox {
+
+    display: inline-block;
+    width: 100%;
+    text-align: end;
+}
